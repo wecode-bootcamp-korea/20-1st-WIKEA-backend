@@ -17,12 +17,12 @@ class User(models.Model):
         db_table = "users"
 
 class Order(models.Model):
-    first_name   = models.CharField(max_length=32)
-    last_name    = models.CharField(max_length=32)
-    address      = models.CharField(max_length=128)
-    sub_address  = models.CharField(max_length=128)
+    first_name   = models.CharField(max_length=32, default="")
+    last_name    = models.CharField(max_length=32, default="")
+    address      = models.CharField(max_length=128, default="")
+    sub_address  = models.CharField(max_length=128, default="")
     user         = models.ForeignKey("User", on_delete=models.CASCADE)
-    status       = models.ForeignKey("OrderStatus", on_delete=models.CASCADE)
+    status       = models.ForeignKey("OrderStatus", default=1 ,on_delete=models.CASCADE)
     order_list   = models.ManyToManyField(Product, through="OrderList")
 
     class Meta:
