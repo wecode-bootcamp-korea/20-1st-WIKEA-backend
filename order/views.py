@@ -40,7 +40,6 @@ class OrderListView(View):
     
     @authorize
     def delete(request, korean_name): 
-        user = request.body
         product = Product.objects.get(korean_name=korean_name)
         if not OrderList.objects.filter(product=product).exists(): 
             return JsonResponse({'MASSAGE':'Non-exists Product'}, status=400)
@@ -52,3 +51,10 @@ class OrderListView(View):
     def all_delete(request): 
         OrderList.objects.all().delete()    
         return JsonResponse({'MASSAGE':'SUCCESS'}, status=200)
+
+class OrderView(View):
+    @authorize  
+    def post(self, request):
+        data = json.loads(request.body)
+        user = request.user
+        
