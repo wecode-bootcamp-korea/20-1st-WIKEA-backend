@@ -202,13 +202,15 @@ class FilterSortView(View):
     def set_filters(self, product_list, request): 
         offset     = request.GET.get('offset', None)
         nextoffset = request.GET.get('nextoffset', None)
-        print(type(nextoffset))
+
         if (offset != "") and (nextoffset != ""):
             product_list = product_list[int(offset):int(nextoffset)]
             return product_list
+
         if offset == "":
             product_list = product_list[:int(nextoffset)]
             return product_list
+            
         if nextoffset == "":
             product_list = product_list[int(offset):]
             return product_list
@@ -228,13 +230,16 @@ class FilterSortView(View):
                     if key == 'sort':
                         if value not in list(sort_list.keys()):
                             return JsonResponse({'MASSAGE':'INVALID SORT'}, status=404)
+
                         elif value == 'NEWEST':
                             result.append({key:list(product_list.filter(is_new=True).values())})
+                            
                         else:
                             result.append({key:list(product_list.order_by(sort_list[value]).values())})
-                        if key not in field_list:
-                            raise Product.DoesNotExist 
-                        result.append({key:list(Product.objects.filter(**{key:value}).values())})
+                        
+                    if key not in field_list:
+                        raise Product.DoesNotExist 
+                    result.append({key:list(Product.objects.filter(**{key:value}).values())})
 
             return JsonResponse({'result':result}, status=200)
 
