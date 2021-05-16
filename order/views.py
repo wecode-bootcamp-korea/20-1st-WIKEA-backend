@@ -2,16 +2,15 @@ from django.http    import JsonResponse
 from django.views   import View
 
 from user.utils     import authorize
-from order.models   import Order, OrderStatus, OrderList
-from user.models    import *
-from product.models import *
+from order.models   import Order, OrderStatus, OrderList, OrderStatus
+from product.models import Product
 
 class OrderListView(View): 
     @authorize
     def post(self, request): 
         data    = json.loads(request.body)
         user    = request.user
-        product = Prodcut.objects.filter(id=data['id']).values()
+        product = Product.objects.filter(id=data['id']).values()
         order   = Order.objects.get(user=user)
         try: 
             OrderList.objects.create(
@@ -55,6 +54,25 @@ class OrderListView(View):
 class OrderView(View):
     @authorize  
     def post(self, request):
-        data = json.loads(request.body)
+        data  = json.loads(request.body)
+        user  = request.user
+        order = Order.objects.get(user=user)
+        Order.objects.create(
+            first_name  = data['first_name'],
+            last_name   = data['last_name'],
+            address     = data['adress'],
+            sub_address = data['sub_adress'],
+            user        = user,
+            status      = OrderStatus.objects.get(id=1),
+            order_list  = OrderList.objects.get(order=order),
+        )
+        return JsonResponse({'MASSAGE':'SUCCESS'}, status=200)
+    
+    @authorize
+    def get(self, request):
         user = request.user
-        
+        if not Order.objects.filter(user=user).exists():
+            return JsonResponse({'order':[]}, status=200)
+
+        order = Order.objects.filter(user=user).values()
+        return JsonResponse({'order':order}, status=200)
