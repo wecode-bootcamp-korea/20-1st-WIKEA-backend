@@ -162,7 +162,7 @@ class ProductDetailView(View):
             product_id   = Product.objects.get(english_name=product_name)
             descriptions = Description.objects.filter(product=product_id).values()
             #color_list  = [color.name for color in product.color.all()]
-            #images      = Image.objects.get(product=product).url
+            #images      = Image.objects.filter(product=product).url
 
             random_number         = random.randrange(1,SubCategory.objects.count()+1)
             recommend_subcategory = SubCategory.objects.get(id=random_number)
@@ -177,7 +177,7 @@ class ProductDetailView(View):
                     'price'       : product_id.price,
                     'stock'       : product_id.stock,
                     'is_new'      : product_id.is_new,
-                    'url'         : 'url',
+                    #'url'         : list(images)
                     'descriptions': list(descriptions),
                 },
             )
@@ -222,25 +222,26 @@ class FilterSortView(View):
             sub_category = SubCategory.objects.get(english_name=sub_category_name)
             product_list = Product.objects.filter(sub_category=sub_category)
             sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
-
+            #pagenation 
             if list(request.GET.keys()) == ['offset', 'nextoffset']:
                 result.append(FilterSortView.list(self, request, sub_category_name))
             else:
                 for key,value in request.GET.items():
+                    #정렬 filter
                     if key == 'sort':
                         if value not in list(sort_list.keys()):
                             return JsonResponse({'MASSAGE':'INVALID SORT'}, status=404)
 
                         elif value == 'NEWEST':
                             result.append({key:list(product_list.filter(is_new=True).values())})
-                            
                         else:
                             result.append({key:list(product_list.order_by(sort_list[value]).values())})
-                        
-                    if key not in field_list:
-                        raise Product.DoesNotExist 
-                    result.append({key:list(Product.objects.filter(**{key:value}).values())})
-
+                    #색상, 가격, 시리즈, 특가, 신제품 filter(가격대 filter code 추가 필요)
+                    elif key != 'sort':
+                        if key not in field_list:
+                            raise Product.DoesNotExist 
+                        else:
+                            result.append({key:list(product_list.filter(**{key:value}).values())})
             return JsonResponse({'result':result}, status=200)
 
         except Product.DoesNotExist as e:
