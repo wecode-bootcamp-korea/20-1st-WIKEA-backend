@@ -1,8 +1,8 @@
 import random
 
-from django.views               import View
-from django.http                import JsonResponse
-from django.core.exceptions     import ValidationError
+from django.views           import View
+from django.http            import JsonResponse
+from django.core.exceptions import ValidationError
 
 from product.models import Product, Category, SubCategory
 
