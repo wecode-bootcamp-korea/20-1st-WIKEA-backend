@@ -6,29 +6,7 @@ from django.core.exceptions     import ValidationError
 
 from product.models import Product, Category, SubCategory
 
-class Category(View):
-    def get(self, request):
-        category_list     = []
-        sub_category_list = {}
-        categorys         = Category.objects.all()
-        for category in categorys:
-            category_list.append(
-                {
-                    'id'          : category.id,
-                    'korean_name' : category.korean_name,
-                    'english_name': category.english_name
-                }
-            )
-            sub_category_list[category.korean_name] = list(SubCategory.objects.filter(category=category).values(
-                    'id',
-                    'korean_name',
-                    'english_name'
-                )
-            )
-        return JsonResponse({'category':category_list,'sub_category':sub_category_list}, status=200)
-
-
-class Main(View):
+class MainView(View):
     def get(self, request):
         # 추천 상품
         recommend_product  = []
@@ -36,15 +14,12 @@ class Main(View):
         recommend_category = Category.objects.get(id=random_number)
         sub_categorys      = SubCategory.objects.filter(category=recommend_category)
         for sub_category in sub_categorys:
-            for product in list(Product.objects.filter(sub_category=sub_category)):
-                recommend_product.append(
-                    {
-                        'is_new'       : product.is_new,
-                        'english_name' : product.english_name,
-                        'korean_name'  : product.korean_name,
-                        'price'        : product.price
-                    }
-                )
+            recommend_product = list(Product.objects.filter(sub_category=sub_category).values(
+                'is_new',
+                'english_name',
+                'korean_name',
+                'price'
+            ))
 
         # 신상품(정해진 Product)
         new_products        = [] # 신상품
