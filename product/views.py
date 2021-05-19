@@ -14,7 +14,11 @@ class SearchView(View):
             products = Product.objects.all()
             if search:
                 products = products.filter(
-                    Q(korean_name__contains = search) & Q(english_name__contains = search))
+                    Q(korean_name__contains = search) & Q(english_name__contains = search)
+                    &Q(sub_category__korean_name__contain = search) & Q(sub_category__english_name__contain = search) 
+                    &Q(category__korean_name__contain = search) & Q(category__korean_name__contatin = search)
+                    &Q(series__korean_name__contain = search) & Q(series__english_name__contain = search)
+                    &Q(color__korean_name__contain = search) & Q(color__english_name__contain = search))
 
                 result = [{
                             'korean_name'       : product.korean_name,
