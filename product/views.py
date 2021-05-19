@@ -31,6 +31,6 @@ class SearchView(View):
                         'series'            : series,
                     } for product in products]
 
-        return JsonResponse({'product':result}, status=200)
+        return JsonResponse({'search':result}, status=200)
 
 
