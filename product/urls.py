@@ -3,5 +3,5 @@ from django.urls import path
 from product.views import SearchView
 
 urlpatterns = [
-    path('/search/', SearchView.as_view()),
+    path('', SearchView.as_view()),
 ]
