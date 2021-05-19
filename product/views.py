@@ -52,7 +52,7 @@ class ProductListView(View):
             queryList = [Q(x) for x in predicates]
 
             print(queryList)
-            if not queryList:
+            if queryList:
                 products = products.filter(functools.reduce(operator.and_, queryList))
 
             product_count = len(list(products))
@@ -79,7 +79,7 @@ class ProductListView(View):
                         'color_list'        : [color.name for color in products.color.all()],
                         'sub_category_name' : sub_category.korean_name,
                         'sub_category_url'  : sub_category.english_name,
-                        'image'             : [image.url for image in list(product.image.all())],
+                        #'image'             : [image.url for image in list(product.image.all())],
                         'series'            : product.series.korean_name,
                         'content'           : sub_category.content,
                         'star'              : uniform(0.0,5.0)
@@ -91,6 +91,7 @@ class ProductListView(View):
             return JsonResponse({'massage':f'{e}'}, status=404)
         
         except KeyError as e:
+            return JsonResponse({'massage':f'{e}'}, status=404)
 
 class ProductDetailView(View):
     def get(self ,request):
