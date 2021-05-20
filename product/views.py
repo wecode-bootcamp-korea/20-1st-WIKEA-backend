@@ -8,23 +8,29 @@ from django.core.exceptions import ValidationError
 
 from product.models         import Product, Category, SubCategory, Comment
 from user.utils             import authorize
-
+from user.models            import User
 class CommentView(View):
     @authorize
     def post(self, request):
-        data = json.loads(request.body)
-        product = Product.objects.get(id=data['product'])
-        user = request.user
-        Comment.objects.create(
-            user=user,
-            product=product,
-            rating=data['star'],
-            content=data['content']
-        )
-        return JsonResponse({'massage':'success'},status=200)
+        try:
+            data    = json.loads(request.body)
+            product = Product.objects.get(id=int(data['product']))
+            user    = request.user
+
+            Comment.objects.create(
+                user=user,
+                product=product,
+                rating=data['star'],
+                content=data['content']
+            )
+            return JsonResponse({'massage':'success'},status=200)
+
+        except KeyError:
+            return JsonResponse({'massage':'keyerror'},status=404)
 
     def get(self, request):
         product_id = request.GET.get('product')
+
         if not Product.objects.filter(id=product_id).exists():
             return JsonResponse({'massage':'fail'},status=404)
 
@@ -35,7 +41,7 @@ class CommentView(View):
             result = [{
                         'rating'  : comment.rating,
                         'content' : comment.content,
-                     }]
+                     } for comment in comments]
             return JsonResponse({'comment':result},status=200)
 
 class RecommendedView(View):
