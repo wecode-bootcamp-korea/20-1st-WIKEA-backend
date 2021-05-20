@@ -35,7 +35,7 @@ class CommentView(View):
             result = [{
                         'rating'  : comment.rating,
                         'content' : comment.content,
-            }]
+                     }]
             return JsonResponse({'comment':result},status=200)
 
 class RecommendedView(View):
