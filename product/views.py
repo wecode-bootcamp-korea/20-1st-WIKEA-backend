@@ -2,7 +2,6 @@ import json
 
 from django.views                 import View
 from django.http                  import JsonResponse
-from django.core.exceptions       import ValidationError
 from django.db.models             import Q
 
 from product.models               import Product
@@ -10,7 +9,7 @@ from product.models               import Product
 class SearchView(View):
     def get(self, request):
         try:
-            search = request.GET.get('q')
+            search   = request.GET.get('q')
             products = Product.objects.all()
             if search:
                 products = products.filter(
